@@ -218,7 +218,43 @@
       }
     ];
 
+    // ==========================================
+    // VIDEO LOADING SCREEN COMPONENT
+    // ==========================================
+    function VideoLoader({ onComplete }) {
+      const videoRef = useRef(null);
+      const [fading, setFading] = useState(false);
+
+      const handleSkip = () => {
+        setFading(true);
+        setTimeout(() => {
+          if (onComplete) onComplete();
+        }, 500);
+      };
+
+      return (
+        <div className={`fixed inset-0 z-[100] bg-zinc-950 flex flex-col items-center justify-center transition-opacity duration-500 ${fading ? 'opacity-0' : 'opacity-100'}`}>
+          <video 
+            ref={videoRef}
+            src="Loading_screen.mp4"
+            autoPlay 
+            muted 
+            playsInline
+            onEnded={handleSkip}
+            className="w-full h-full object-contain max-w-4xl max-h-[85vh]"
+          />
+          <button 
+            onClick={handleSkip}
+            className="absolute bottom-10 text-[10px] uppercase tracking-widest text-zinc-400 hover:text-white transition-colors underline font-mono bg-zinc-900/80 px-4 py-2 rounded-full border border-zinc-800"
+          >
+            Skip Intro →
+          </button>
+        </div>
+      );
+    }
+
     function App() {
+      const [isLoading, setIsLoading] = useState(true);
       const [activeTab, setActiveTab] = useState('home');
       const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
       const [currentSlide, setCurrentSlide] = useState(0);
@@ -368,11 +404,15 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
       return (
         <div className="min-h-screen flex flex-col justify-between">
           
+          {/* VIDEO LOADING SCREEN */}
+          {isLoading && (
+            <VideoLoader onComplete={() => setIsLoading(false)} />
+          )}
+
           {/* NAVBAR */}
           <nav className="sticky top-0 bg-zinc-950/95 backdrop-blur-md border-b border-zinc-900 z-50">
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
               
-              {/* Logo */}
               <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { setActiveTab('home'); setMobileMenuOpen(false); }}>
                 <div className="w-10 h-10 border-2 border-[#c2a278] flex items-center justify-center rounded-lg bg-zinc-900">
                   <span className="text-[#c2a278] font-bold text-xl tracking-tighter">AFA</span>
@@ -383,7 +423,6 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
                 </div>
               </div>
 
-              {/* Desktop Nav Links */}
               <div className="hidden md:flex items-center space-x-1 text-xs uppercase tracking-widest font-semibold">
                 {navTabs.map(tab => (
                   <button
@@ -400,7 +439,6 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
                 ))}
               </div>
 
-              {/* Right Actions: Desktop CTA & Mobile Hamburger */}
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => { setActiveTab('contact'); setMobileMenuOpen(false); }}
@@ -409,7 +447,6 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
                   Get Quote
                 </button>
 
-                {/* Hamburger Button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                   className="md:hidden text-zinc-200 hover:text-[#c2a278] p-2 focus:outline-none"
@@ -429,7 +466,6 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
 
             </div>
 
-            {/* Mobile Menu Dropdown Drawer */}
             {mobileMenuOpen && (
               <div className="md:hidden bg-zinc-900 border-b border-zinc-800 px-6 py-4 space-y-3 font-semibold text-xs uppercase tracking-widest">
                 {navTabs.map(tab => (
@@ -453,7 +489,6 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
             )}
           </nav>
 
-          {/* CONTENT ROUTER */}
           <main className="flex-1">
             {activeTab === 'home' && (
               <div>
@@ -489,7 +524,7 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
 
                 <section className="py-16 px-6 bg-zinc-900 border-y border-zinc-800 text-center">
                   <div className="max-w-4xl mx-auto">
-                    <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] font-bold block mb-3">Our Core Philosophy</span>
+                    <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] block mb-3">Our Core Philosophy</span>
                     <h2 className="text-xl sm:text-3xl font-light text-white leading-relaxed italic">
                       "We design spaces that engage people and allow them to discover new things—beneath, above, and around them."
                     </h2>
@@ -658,13 +693,10 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
               </section>
             )}
 
-            {/* ABOUT US & OFFICES TAB */}
             {activeTab === 'about' && (
               <div className="py-16 px-6 max-w-7xl mx-auto space-y-20">
-                
-                {/* 1. About Story */}
                 <section className="text-center max-w-3xl mx-auto">
-                  <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] font-bold block mb-3">About Our Practice</span>
+                  <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] block mb-3 font-bold">About Our Practice</span>
                   <h1 className="text-3xl sm:text-5xl font-extralight text-white uppercase font-serif">
                     AFA & <span className="font-semibold">TEAM</span>
                   </h1>
@@ -677,10 +709,9 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
                   </div>
                 </section>
 
-                {/* 2. Team Members */}
                 <section>
                   <div className="text-center max-w-2xl mx-auto mb-12">
-                    <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] font-bold block mb-2">Key Personnel</span>
+                    <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] block mb-2 font-bold">Key Personnel</span>
                     <h2 className="text-2xl sm:text-4xl font-light text-white uppercase font-serif">OUR <span className="font-semibold">TEAM</span></h2>
                   </div>
 
@@ -698,10 +729,9 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
                   </div>
                 </section>
 
-                {/* 3. Offices */}
                 <section>
                   <div className="text-center max-w-2xl mx-auto mb-12">
-                    <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] font-bold block mb-2">Global Presence</span>
+                    <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] block mb-2 font-bold">Global Presence</span>
                     <h2 className="text-2xl sm:text-4xl font-light text-white uppercase font-serif">OUR <span className="font-semibold">OFFICES</span></h2>
                   </div>
 
@@ -722,11 +752,9 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
                     ))}
                   </div>
                 </section>
-
               </div>
             )}
 
-            {/* CONTACT TAB */}
             {activeTab === 'contact' && (
               <section className="py-16 px-6 max-w-6xl mx-auto">
                 <div className="text-center max-w-3xl mx-auto mb-12">
@@ -778,7 +806,6 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
             )}
           </main>
 
-          {/* AI CHAT CONCIERGE WIDGET */}
           <div className="fixed bottom-6 right-6 z-50">
             {!chatOpen ? (
               <button 
@@ -825,7 +852,6 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
             )}
           </div>
 
-          {/* FOOTER */}
           <footer className="bg-zinc-900 border-t border-zinc-800 py-8 px-6 text-center text-xs text-zinc-500 font-mono">
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
               <div><strong className="text-zinc-300">AFA & TEAM</strong> | Archi Athar</div>
