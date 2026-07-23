@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AFA & Team - Architecture & Interior Designer</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel Standalone (Compiles JSX directly in browser) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .font-serif {
+      font-family: 'Playfair Display', serif;
+    }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 antialiased selection:bg-[#c2a278] selection:text-zinc-950">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // DATA FROM ARCHI-ATHAR.COM
+    const HERO_SLIDES = [
+      {
+        id: 1,
+        subtitle: "A Natural Aptitude Towards The Arts",
+        title: "INNOVATE YOUR HOME",
+        desc: "Color Consultation | Lighting Design | Furniture Design",
+        bg: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=85"
+      },
+      {
+        id: 2,
+        subtitle: "Our Services!",
+        title: "READY TO CREATE YOUR DREAMS",
+        desc: "We design spaces that engage people and allow them to discover new things—beneath, above, and around them.",
+        bg: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1920&q=85"
+      },
+      {
+        id: 3,
+        subtitle: "Bespoke Architecture & Interiors",
+        title: "SUSTAINABLE LUXURY LIVING",
+        desc: "We take great pride in building spaces that are as green as they are beautiful.",
+        bg: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=85"
+      }
+    ];
+
+    const CATEGORIES = [
+      { id: 'all', label: 'All Categories' },
+      { id: 'exclusive', label: 'Exclusive Projects' },
+      { id: 'commercial', label: 'Commercial' },
+      { id: 'residential', label: 'Residential' },
+      { id: 'industrial', label: 'Industrial' },
+      { id: 'interior', label: 'Interior' },
+      { id: 'landscape', label: 'Landscape' }
+    ];
+
+    const PORTFOLIO_PROJECTS = [
+      {
+        id: 'p1',
+        category: 'exclusive',
+        title: 'Exclusive Minimalist Residence',
+        tagline: 'Large scale, minimalist design, sustainable living, green architecture.',
+        img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+        location: 'Mumbai Outer Ring',
+        scale: '18,500 sq. ft.'
+      },
+      {
+        id: 'p2',
+        category: 'commercial',
+        title: 'Modern Business Complex',
+        tagline: "When it's time to build something special for your business, you can count on us.",
+        img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
+        location: 'Mumbai Corporate Hub',
+        scale: '24,000 sq. ft.'
+      },
+      {
+        id: 'p3',
+        category: 'residential',
+        title: 'Eco-Friendly Sanctuary',
+        tagline: 'We take great pride in building homes that are as green as they are beautiful.',
+        img: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=80',
+        location: 'Malegaon Fort Side',
+        scale: '5,200 sq. ft.'
+      },
+      {
+        id: 'p4',
+        category: 'industrial',
+        title: 'Precision Assembly Hub',
+        tagline: 'Business is a game of inches; we as an architectural firm will help you win the game.',
+        img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80',
+        location: 'Malegaon MIDC',
+        scale: '32,000 sq. ft.'
+      },
+      {
+        id: 'p5',
+        category: 'interior',
+        title: 'Luxury Natural Interior',
+        tagline: 'Every corner of the home can be a mixture of nature and architecture.',
+        img: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80',
+        location: 'Lodha Road Penthouse',
+        scale: '2,800 sq. ft.'
+      },
+      {
+        id: 'p6',
+        category: 'landscape',
+        title: 'Community Story Landscape',
+        tagline: 'We help communities find their soul by unlocking stories within their landscape, culture, and character.',
+        img: 'https://images.unsplash.com/photo-1558036117-15d82a90b9b1?auto=format&fit=crop&w=800&q=80',
+        location: 'Darul Aman Estates',
+        scale: '12,000 sq. ft.'
+      }
+    ];
+
+    const DETAILED_SERVICES = [
+      {
+        id: 's1',
+        num: '01',
+        title: 'Consultancy & Planning',
+        subtitle: 'Offering an array of services in the fields of architecture & interior design.',
+        items: [
+          'Client brief preparation & site analysis',
+          'Environmental impact assessment',
+          'Sanitary, plumbing, drainage & water supply design',
+          'Electrical, electronic & communication systems',
+          'HVAC heating, ventilation & air conditioning',
+          'Fire detection, fire protection & security systems'
+        ]
+      },
+      {
+        id: 's2',
+        num: '02',
+        title: 'Architectural & Interior Design',
+        subtitle: 'Impeccable craftsmanship and luxury reflected in all we do.',
+        items: [
+          'Architectural Design & Space Masterplanning',
+          'Town Planning & Urban Layouts',
+          'Structural Design & Load Analysis',
+          'Interior Design & Custom Furniture Fit-outs',
+          'Construction Supervision & Quality Control'
+        ]
+      },
+      {
+        id: 's3',
+        num: '03',
+        title: 'Execution & Allied Fields',
+        subtitle: 'Complete turnkey project execution, contracts, and retrofitting.',
+        items: [
+          'Turnkey Project Execution',
+          'Project Contracts (Labour & Material)',
+          'Estimation & Cost Analysis',
+          'Landscape Architecture & Environmental Design',
+          'Architectural Conservation & Retrofitting',
+          'Graphic Design and Signage'
+        ]
+      }
+    ];
+
+    const TEAM_MEMBERS = [
+      {
+        name: 'Ather Shazan',
+        role: 'Principal Architect',
+        desc: 'Lead creative director bringing sensitivity and fine craftsmanship to luxury design across homes, offices, and hotels.'
+      },
+      {
+        name: 'Zohair Safwan',
+        role: 'Construction Manager & Partner',
+        desc: 'Operations and on-site construction head ensuring seamless material execution and turnkey contract delivery.'
+      },
+      {
+        name: 'Abdul Haseeb',
+        role: 'Interior Designer & Associate',
+        desc: 'Specialist in custom millwork, furniture design, space lighting, and luxurious interior arrangements.'
+      },
+      {
+        name: 'Moeen Ahmed',
+        role: 'Senior Engineer',
+        desc: 'Structural engineering and MEP lead coordinating load limits, HVAC networks, and electrical systems.'
+      }
+    ];
+
+    const OFFICES = [
+      {
+        title: "Head Office",
+        address: "172, Darul Aman, Fort, Malegaon – 423203, Nasik, Maharashtra, India",
+        phone: "+91-9271239892 / +91-7385944493",
+        email: "atharfaizeearchitects@gmail.com"
+      },
+      {
+        title: "Mumbai Office",
+        address: "Chandresh Rachana, Lodha Road, Mumbai, Maharashtra, India",
+        phone: "+91-9271239892",
+        email: "atharfaizeearchitects@gmail.com"
+      },
+      {
+        title: "Dubai Office",
+        address: "Opening Soon",
+        phone: "International Desk",
+        email: "atharfaizeearchitects@gmail.com"
+      }
+    ];
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('home');
+      const [currentSlide, setCurrentSlide] = useState(0);
+      const [selectedCategory, setSelectedCategory] = useState('all');
+
+      // Estimator State
+      const [estSize, setEstSize] = useState(2500);
+      const [estType, setEstType] = useState('residential');
+      const [estScope, setEstScope] = useState('consultancy');
+
+      // Contact Form State
+      const [formState, setFormState] = useState({ name: '', email: '', phone: '', service: 'Architectural Design', message: '' });
+      const [formSubmitted, setFormSubmitted] = useState(false);
+
+      useEffect(() => {
+        const timer = setInterval(() => {
+          setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+        }, 5000);
+        return () => clearInterval(timer);
+      }, []);
+
+      const filteredProjects = selectedCategory === 'all'
+        ? PORTFOLIO_PROJECTS
+        : PORTFOLIO_PROJECTS.filter(p => p.category === selectedCategory);
+
+      const getEstimation = () => {
+        let rate = 150;
+        if (estType === 'commercial') rate = 180;
+        if (estType === 'exclusive') rate = 300;
+        if (estType === 'industrial') rate = 120;
+
+        if (estScope === 'interior') rate *= 4.5;
+        if (estScope === 'turnkey') rate *= 12.0;
+
+        const totalCost = estSize * rate;
+        const months = Math.max(4, Math.ceil(estSize / 350));
+
+        return { rate, totalCost, months };
+      };
+
+      const estData = getEstimation();
+
+      const handleFormSubmit = (e) => {
+        e.preventDefault();
+        setFormSubmitted(true);
+        setTimeout(() => {
+          setFormSubmitted(false);
+          setFormState({ name: '', email: '', phone: '', service: 'Architectural Design', message: '' });
+        }, 4000);
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col justify-between">
+          
+          {/* HEADER BAR */}
+          <div>
+            <div className="bg-zinc-900 border-b border-zinc-800 text-[11px] py-2 px-6 hidden sm:block">
+              <div className="max-w-7xl mx-auto flex justify-between items-center text-zinc-400 font-mono">
+                <div className="flex items-center space-x-6">
+                  <span>📞 Call: +91-9271239892 / +91-7385944493</span>
+                  <span>✉ Email: atharfaizeearchitects@gmail.com</span>
+                </div>
+                <div>
+                  <span>📍 Offices: Malegaon | Mumbai | Dubai (Soon)</span>
+                </div>
+              </div>
+            </div>
+
+            <nav className="sticky top-0 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-900 z-40">
+              <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                
+                <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('home')}>
+                  <div className="w-10 h-10 border-2 border-[#c2a278] flex items-center justify-center rounded-lg bg-zinc-900">
+                    <span className="text-[#c2a278] font-bold text-xl tracking-tighter">AFA</span>
+                  </div>
+                  <div>
+                    <span className="text-lg font-bold tracking-[0.2em] text-white block">AFA & TEAM</span>
+                    <span className="text-[9px] uppercase tracking-[0.35em] text-[#c2a278] block">archi-athar.com</span>
+                  </div>
+                </div>
+
+                <div className="hidden md:flex items-center space-x-1 text-xs uppercase tracking-widest font-semibold">
+                  {[
+                    { id: 'home', label: 'Home' },
+                    { id: 'services', label: 'Services' },
+                    { id: 'projects', label: 'Projects' },
+                    { id: 'estimator', label: 'Estimator' },
+                    { id: 'about', label: 'About Us' },
+                    { id: 'contact', label: 'Contact Us' }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`px-4 py-2 transition-all ${
+                        activeTab === tab.id 
+                          ? 'text-[#c2a278] border-b-2 border-[#c2a278] font-bold' 
+                          : 'text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setActiveTab('contact')}
+                  className="bg-[#c2a278] hover:bg-[#b08e63] text-zinc-950 font-bold text-xs uppercase tracking-widest px-4 py-2.5 rounded transition-all"
+                >
+                  Get Quote
+                </button>
+              </div>
+            </nav>
+          </div>
+
+          {/* CONTENT ROUTER */}
+          <main className="flex-1">
+            {activeTab === 'home' && (
+              <div>
+                <section className="relative h-[75vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center transition-all duration-1000 transform scale-105"
+                    style={{ backgroundImage: `url(${HERO_SLIDES[currentSlide].bg})` }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-zinc-950/30" />
+                  </div>
+
+                  <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
+                    <span className="text-[10px] uppercase tracking-[0.35em] text-[#c2a278] font-bold block mb-4 bg-zinc-900/80 px-4 py-2 rounded-full border border-zinc-800 w-fit mx-auto backdrop-blur-md">
+                      {HERO_SLIDES[currentSlide].subtitle}
+                    </span>
+                    <h1 className="text-4xl sm:text-6xl font-extralight text-white tracking-tight leading-tight uppercase font-serif">
+                      {HERO_SLIDES[currentSlide].title}
+                    </h1>
+                    <p className="mt-4 text-zinc-300 text-sm font-light max-w-xl mx-auto leading-relaxed">
+                      {HERO_SLIDES[currentSlide].desc}
+                    </p>
+
+                    <div className="mt-8 flex justify-center gap-4">
+                      <button 
+                        onClick={() => setActiveTab('projects')}
+                        className="bg-[#c2a278] hover:bg-[#b08e63] text-zinc-950 font-bold px-6 py-3 rounded uppercase tracking-widest text-xs transition-all"
+                      >
+                        Explore Projects
+                      </button>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="py-16 px-6 bg-zinc-900 border-y border-zinc-800 text-center">
+                  <div className="max-w-4xl mx-auto">
+                    <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] font-bold block mb-3">Our Core Philosophy</span>
+                    <h2 className="text-xl sm:text-3xl font-light text-white leading-relaxed italic">
+                      "We design spaces that engage people and allow them to discover new things—beneath, above, and around them."
+                    </h2>
+                  </div>
+                </section>
+
+                <section className="py-16 px-6 max-w-7xl mx-auto">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="p-6 bg-zinc-900/40 border border-zinc-850 rounded-xl text-center">
+                      <div className="text-3xl font-extrabold text-[#c2a278] font-mono">250 +</div>
+                      <div className="text-[10px] uppercase tracking-widest text-zinc-400 mt-2 font-semibold">Projects Completed</div>
+                    </div>
+                    <div className="p-6 bg-zinc-900/40 border border-zinc-850 rounded-xl text-center">
+                      <div className="text-3xl font-extrabold text-white font-mono">5 +</div>
+                      <div className="text-[10px] uppercase tracking-widest text-zinc-400 mt-2 font-semibold">Years of Experience</div>
+                    </div>
+                    <div className="p-6 bg-zinc-900/40 border border-zinc-850 rounded-xl text-center">
+                      <div className="text-3xl font-extrabold text-[#c2a278] font-mono">30 +</div>
+                      <div className="text-[10px] uppercase tracking-widest text-zinc-400 mt-2 font-semibold">Ongoing Projects</div>
+                    </div>
+                    <div className="p-6 bg-zinc-900/40 border border-zinc-850 rounded-xl text-center">
+                      <div className="text-3xl font-extrabold text-white font-mono">2 +</div>
+                      <div className="text-[10px] uppercase tracking-widest text-zinc-400 mt-2 font-semibold">Active Offices</div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            )}
+
+            {activeTab === 'services' && (
+              <section className="py-16 px-6 max-w-7xl mx-auto">
+                <div className="text-center max-w-3xl mx-auto mb-12">
+                  <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] block mb-2 font-bold">What We Offer</span>
+                  <h1 className="text-3xl sm:text-5xl font-extralight text-white uppercase font-serif">OUR <span className="font-semibold">SERVICES</span></h1>
+                </div>
+
+                <div className="space-y-8">
+                  {DETAILED_SERVICES.map((srv) => (
+                    <div key={srv.id} className="bg-zinc-900/40 border border-zinc-850 rounded-2xl p-6 sm:p-10">
+                      <div className="flex flex-col lg:flex-row justify-between gap-6">
+                        <div className="lg:w-1/3">
+                          <span className="text-3xl font-extrabold text-[#c2a278]/30 font-mono block mb-1">{srv.num}</span>
+                          <h2 className="text-2xl font-bold text-white mb-2">{srv.title}</h2>
+                          <p className="text-zinc-400 text-xs font-light">{srv.subtitle}</p>
+                        </div>
+                        <div className="lg:w-2/3 bg-zinc-950 p-6 rounded-xl border border-zinc-800">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {srv.items.map((item, idx) => (
+                              <div key={idx} className="flex items-start space-x-2 text-xs text-zinc-300">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#c2a278] mt-1 flex-shrink-0" />
+                                <span>{item}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {activeTab === 'projects' && (
+              <section className="py-16 px-6 max-w-7xl mx-auto">
+                <div className="text-center max-w-3xl mx-auto mb-10">
+                  <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] block mb-2 font-bold">Portfolio Matrix</span>
+                  <h1 className="text-3xl sm:text-5xl font-extralight text-white uppercase font-serif">FEATURED <span className="font-semibold">PROJECTS</span></h1>
+                </div>
+
+                <div className="flex flex-wrap justify-center gap-2 mb-10">
+                  {CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={`px-4 py-2 rounded text-xs font-semibold uppercase tracking-wider transition-all ${
+                        selectedCategory === cat.id 
+                          ? 'bg-[#c2a278] text-zinc-950 font-bold' 
+                          : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProjects.map((p) => (
+                    <div key={p.id} className="bg-zinc-900/30 border border-zinc-850 rounded-xl overflow-hidden flex flex-col justify-between">
+                      <div className="h-52 relative overflow-hidden">
+                        <img src={p.img} alt={p.title} className="w-full h-full object-cover" />
+                        <span className="absolute top-3 left-3 bg-zinc-950/90 text-[#c2a278] text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded border border-[#c2a278]/20">
+                          {p.category}
+                        </span>
+                      </div>
+                      <div className="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                          <h3 className="text-lg font-bold text-white mb-2">{p.title}</h3>
+                          <p className="text-zinc-400 text-xs font-light">{p.tagline}</p>
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-zinc-850 flex justify-between text-xs text-zinc-500 font-mono">
+                          <span>{p.location}</span>
+                          <span className="text-[#c2a278] font-bold">{p.scale}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {activeTab === 'estimator' && (
+              <section className="py-16 px-6 max-w-4xl mx-auto">
+                <div className="text-center mb-12">
+                  <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] block mb-2 font-bold">Cost Calculator</span>
+                  <h1 className="text-3xl sm:text-5xl font-extralight text-white uppercase font-serif">FEE <span className="font-semibold">ESTIMATOR</span></h1>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                  <div className="md:col-span-7 bg-zinc-900/40 border border-zinc-850 p-6 rounded-xl space-y-5 text-xs">
+                    <div>
+                      <label className="text-zinc-400 uppercase font-bold block mb-2">Build Type</label>
+                      <select value={estType} onChange={(e) => setEstType(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded p-3 text-white">
+                        <option value="residential">Residential Villa / Home</option>
+                        <option value="commercial">Commercial Hub / Office</option>
+                        <option value="exclusive">Exclusive Project</option>
+                        <option value="industrial">Industrial Facility</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-zinc-400 uppercase font-bold block mb-2">Service Intensity</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {['consultancy', 'interior', 'turnkey'].map(s => (
+                          <button key={s} onClick={() => setEstScope(s)} className={`p-2.5 rounded border text-center font-bold uppercase ${estScope === s ? 'bg-[#c2a278] text-zinc-950 border-[#c2a278]' : 'bg-zinc-950 text-zinc-400 border-zinc-800'}`}>
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <label className="text-zinc-400 uppercase font-bold">Floor Area Size</label>
+                        <span className="text-[#c2a278] font-bold font-mono">{estSize.toLocaleString()} SQFT</span>
+                      </div>
+                      <input type="range" min="500" max="50000" step="500" value={estSize} onChange={(e) => setEstSize(parseInt(e.target.value))} className="w-full h-1 bg-zinc-950 rounded cursor-pointer accent-[#c2a278]" />
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-5 bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 p-6 rounded-xl space-y-4">
+                    <span className="text-[10px] uppercase tracking-widest text-[#c2a278] font-bold block">Summary</span>
+                    <div>
+                      <span className="text-zinc-500 text-[10px] uppercase block">Base Rate</span>
+                      <div className="text-lg font-bold text-white font-mono">₹{estData.rate} / sq. ft.</div>
+                    </div>
+                    <div className="border-t border-zinc-800 pt-3">
+                      <span className="text-zinc-500 text-[10px] uppercase block">Est. Cost</span>
+                      <div className="text-2xl font-extrabold text-[#c2a278] font-mono">₹{estData.totalCost.toLocaleString()}</div>
+                    </div>
+                    <div className="border-t border-zinc-800 pt-3">
+                      <span className="text-zinc-500 text-[10px] uppercase block">Timeline</span>
+                      <div className="text-lg font-bold text-white font-mono">{estData.months} Months</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {activeTab === 'about' && (
+              <section className="py-16 px-6 max-w-7xl mx-auto">
+                <div className="text-center max-w-3xl mx-auto mb-12">
+                  <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] block mb-2 font-bold">Our Team</span>
+                  <h1 className="text-3xl sm:text-5xl font-extralight text-white uppercase font-serif">AFA & <span className="font-semibold">TEAM</span></h1>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {TEAM_MEMBERS.map((m, idx) => (
+                    <div key={idx} className="bg-zinc-900/40 border border-zinc-850 rounded-xl p-5 text-center">
+                      <div className="w-16 h-16 bg-[#c2a278]/10 text-[#c2a278] border border-[#c2a278]/30 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-3">
+                        {m.name[0]}
+                      </div>
+                      <h3 className="text-base font-bold text-white">{m.name}</h3>
+                      <span className="text-[10px] uppercase tracking-widest text-[#c2a278] font-bold block mb-2">{m.role}</span>
+                      <p className="text-zinc-400 text-xs font-light leading-relaxed">{m.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {activeTab === 'contact' && (
+              <section className="py-16 px-6 max-w-6xl mx-auto">
+                <div className="text-center max-w-3xl mx-auto mb-12">
+                  <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] block mb-2 font-bold">Connect</span>
+                  <h1 className="text-3xl sm:text-5xl font-extralight text-white uppercase font-serif">GET IN <span className="font-semibold">TOUCH</span></h1>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                  <div className="lg:col-span-5 space-y-4">
+                    {OFFICES.map((off, idx) => (
+                      <div key={idx} className="p-5 bg-zinc-900/40 border border-zinc-850 rounded-xl text-xs">
+                        <h3 className="font-bold text-white mb-1">{off.title}</h3>
+                        <p className="text-zinc-400 mb-2 font-light">{off.address}</p>
+                        <div className="text-[#c2a278] font-mono space-y-1">
+                          <div>📞 {off.phone}</div>
+                          <div>✉ {off.email}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="lg:col-span-7 bg-zinc-900/20 border border-zinc-850 p-6 rounded-2xl">
+                    {formSubmitted ? (
+                      <div className="text-center py-12 text-emerald-400 font-bold text-sm">✓ Inquiry Logged Successfully!</div>
+                    ) : (
+                      <form onSubmit={handleFormSubmit} className="space-y-4 text-xs">
+                        <div>
+                          <label className="text-zinc-400 uppercase font-bold block mb-1">Name</label>
+                          <input type="text" required value={formState.name} onChange={(e) => setFormState({ ...formState, name: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded p-3 text-white" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-zinc-400 uppercase font-bold block mb-1">Email</label>
+                            <input type="email" required value={formState.email} onChange={(e) => setFormState({ ...formState, email: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded p-3 text-white" />
+                          </div>
+                          <div>
+                            <label className="text-zinc-400 uppercase font-bold block mb-1">Phone</label>
+                            <input type="tel" required value={formState.phone} onChange={(e) => setFormState({ ...formState, phone: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded p-3 text-white" />
+                          </div>
+                        </div>
+                        <button type="submit" className="w-full bg-[#c2a278] hover:bg-[#b08e63] text-zinc-950 font-bold py-3.5 rounded uppercase tracking-widest">
+                          Submit Request
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                </div>
+              </section>
+            )}
+          </main>
+
+          {/* FOOTER */}
+          <footer className="bg-zinc-900 border-t border-zinc-800 py-8 px-6 text-center text-xs text-zinc-500 font-mono">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div><strong className="text-zinc-300">AFA & TEAM</strong> | Archi Athar</div>
+              <div>Copyright © 2026 AFA & Team. All rights reserved. | archi-athar.com</div>
+            </div>
+          </footer>
+
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
