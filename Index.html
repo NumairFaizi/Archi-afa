@@ -32,7 +32,10 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
-    // DATA FROM ARCHI-ATHAR.COM
+    // ==========================================
+    // OFFICIAL DATA DIRECT FROM ARCHI-ATHAR.COM
+    // ==========================================
+
     const HERO_SLIDES = [
       {
         id: 1,
@@ -134,8 +137,8 @@
           'Client brief preparation & site analysis',
           'Environmental impact assessment',
           'Sanitary, plumbing, drainage & water supply design',
-          'Electrical, electronic & communication systems',
-          'HVAC heating, ventilation & air conditioning',
+          'Electrical, electronic & communication systems design',
+          'HVAC heating, ventilation & air conditioning mechanical design',
           'Fire detection, fire protection & security systems'
         ]
       },
@@ -162,7 +165,7 @@
           'Project Contracts (Labour & Material)',
           'Estimation & Cost Analysis',
           'Landscape Architecture & Environmental Design',
-          'Architectural Conservation & Retrofitting',
+          'Architectural Conservation & Building Retrofitting',
           'Graphic Design and Signage'
         ]
       }
@@ -170,21 +173,25 @@
 
     const TEAM_MEMBERS = [
       {
+        initials: 'AS',
         name: 'Ather Shazan',
         role: 'Principal Architect',
         desc: 'Lead creative director bringing sensitivity and fine craftsmanship to luxury design across homes, offices, and hotels.'
       },
       {
+        initials: 'ZS',
         name: 'Zohair Safwan',
         role: 'Construction Manager & Partner',
         desc: 'Operations and on-site construction head ensuring seamless material execution and turnkey contract delivery.'
       },
       {
+        initials: 'AH',
         name: 'Abdul Haseeb',
         role: 'Interior Designer & Associate',
         desc: 'Specialist in custom millwork, furniture design, space lighting, and luxurious interior arrangements.'
       },
       {
+        initials: 'MA',
         name: 'Moeen Ahmed',
         role: 'Senior Engineer',
         desc: 'Structural engineering and MEP lead coordinating load limits, HVAC networks, and electrical systems.'
@@ -193,21 +200,24 @@
 
     const OFFICES = [
       {
-        title: "Head Office",
+        tag: "Central Studio",
+        title: "Head Office (Malegaon)",
         address: "172, Darul Aman, Fort, Malegaon – 423203, Nasik, Maharashtra, India",
-        phone: "+91-9271239892 / +91-7385944493",
+        phones: ["+91-9271239892", "+91-7385944493"],
         email: "atharfaizeearchitects@gmail.com"
       },
       {
+        tag: "Branch Studio",
         title: "Mumbai Office",
         address: "Chandresh Rachana, Lodha Road, Mumbai, Maharashtra, India",
-        phone: "+91-9271239892",
+        phones: ["+91-9271239892"],
         email: "atharfaizeearchitects@gmail.com"
       },
       {
+        tag: "Expansion",
         title: "Dubai Office",
-        address: "Opening Soon",
-        phone: "International Desk",
+        address: "International Middle East Branch",
+        status: "Opening Soon",
         email: "atharfaizeearchitects@gmail.com"
       }
     ];
@@ -226,12 +236,27 @@
       const [formState, setFormState] = useState({ name: '', email: '', phone: '', service: 'Architectural Design', message: '' });
       const [formSubmitted, setFormSubmitted] = useState(false);
 
+      // AI Chatbot State
+      const [chatOpen, setChatOpen] = useState(false);
+      const [chatMessages, setChatMessages] = useState([
+        { role: 'assistant', text: "Welcome to AFA & Team (Archi Athar). I am your design concierge. How can I assist you with our services, team, or project estimates today?" }
+      ]);
+      const [chatInput, setChatInput] = useState('');
+      const [chatLoading, setChatLoading] = useState(false);
+      const chatEndRef = useRef(null);
+
       useEffect(() => {
         const timer = setInterval(() => {
           setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
         }, 5000);
         return () => clearInterval(timer);
       }, []);
+
+      useEffect(() => {
+        if (chatEndRef.current) {
+          chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, [chatMessages, chatLoading]);
 
       const filteredProjects = selectedCategory === 'all'
         ? PORTFOLIO_PROJECTS
@@ -253,6 +278,77 @@
       };
 
       const estData = getEstimation();
+
+      const handleSendMessage = async (e) => {
+        if (e) e.preventDefault();
+        if (!chatInput.trim()) return;
+
+        const userText = chatInput.trim();
+        setChatMessages(prev => [...prev, { role: 'user', text: userText }]);
+        setChatInput('');
+        setChatLoading(true);
+
+        const systemPrompt = `You are the Official AI Design Assistant for "AFA & Team" (Archi Athar - Architecture and Interior Designer).
+Official Website: archi-athar.com
+
+Key Information:
+- Motto: "A Natural Aptitude Towards The Arts"
+- Core Design Philosophy: "We design spaces that engage people and allow them to discover new things—beneath, above, and around them."
+- Services Offered: Consultancy, Architectural Design, Town Planning, Structural Design, Interior Design, Construction Supervision, Turnkey Projects, Project Contracts (Labour & Material), Estimation & Cost, Landscape Architecture, Architectural Conservation, Building Retrofitting.
+- Leadership Team:
+  1. Ather Shazan - Principal Architect
+  2. Zohair Safwan - Construction Manager & Partner
+  3. Abdul Haseeb - Interior Designer & Associate
+  4. Moeen Ahmed - Senior Engineer
+- Metrics: 250+ Projects Completed, 5+ Years of Experience, 30+ Ongoing Projects, 2+ Offices.
+- Offices & Contact:
+  - Head Office: 172, Darul Aman, Fort, Malegaon – 423203, Nasik, Maharashtra, India.
+  - Mumbai Office: Chandresh Rachana, Lodha Road, Mumbai, Maharashtra, India.
+  - Dubai Office: Opening Soon.
+  - Phone: +91-9271239892 / +91-7385944493
+  - Email: atharfaizeearchitects@gmail.com
+
+Respond in a sophisticated, polite, and professional tone suitable for a premium architecture firm. Keep responses concise and informative.`;
+
+        const apiKey = "";
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        let retries = 5;
+        let delay = 1000;
+        let botReply = "";
+
+        const payload = {
+          contents: [{ parts: [{ text: userText }] }],
+          systemInstruction: { parts: [{ text: systemPrompt }] }
+        };
+
+        while (retries > 0) {
+          try {
+            const response = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error("API Connection Error");
+
+            const data = await response.json();
+            botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Thank you for reaching out. Please contact our main office at +91-9271239892 for direct assistance.";
+            break;
+          } catch (err) {
+            retries--;
+            if (retries === 0) {
+              botReply = "Our system is experiencing high traffic. Please call us directly at +91-9271239892 or email atharfaizeearchitects@gmail.com.";
+            } else {
+              await new Promise(r => setTimeout(r, delay));
+              delay *= 2;
+            }
+          }
+        }
+
+        setChatMessages(prev => [...prev, { role: 'assistant', text: botReply }]);
+        setChatLoading(false);
+      };
 
       const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -531,28 +627,75 @@
               </section>
             )}
 
+            {/* ABOUT US & OFFICES TAB */}
             {activeTab === 'about' && (
-              <section className="py-16 px-6 max-w-7xl mx-auto">
-                <div className="text-center max-w-3xl mx-auto mb-12">
-                  <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] block mb-2 font-bold">Our Team</span>
-                  <h1 className="text-3xl sm:text-5xl font-extralight text-white uppercase font-serif">AFA & <span className="font-semibold">TEAM</span></h1>
-                </div>
+              <div className="py-16 px-6 max-w-7xl mx-auto space-y-20">
+                
+                {/* 1. About Story */}
+                <section className="text-center max-w-3xl mx-auto">
+                  <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] font-bold block mb-3">About Our Practice</span>
+                  <h1 className="text-3xl sm:text-5xl font-extralight text-white uppercase font-serif">
+                    AFA & <span className="font-semibold">TEAM</span>
+                  </h1>
+                  <p className="text-zinc-400 mt-6 text-sm font-light leading-relaxed">
+                    AFA & Team is an Architecture and Interior design consultancy firm that brings sensitivity to the design of top restaurants, hotels, offices, and homes around the world. We design spaces that engage people and allow them to discover new things—beneath, above, and around them.
+                  </p>
+                  <div className="mt-8 p-6 bg-zinc-900/50 border border-zinc-800 rounded-2xl">
+                    <span className="text-xs text-[#c2a278] font-bold uppercase tracking-widest block mb-2">Our Motto</span>
+                    <h3 className="text-lg font-serif italic text-white">"A Natural Aptitude Towards The Arts"</h3>
+                  </div>
+                </section>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {TEAM_MEMBERS.map((m, idx) => (
-                    <div key={idx} className="bg-zinc-900/40 border border-zinc-850 rounded-xl p-5 text-center">
-                      <div className="w-16 h-16 bg-[#c2a278]/10 text-[#c2a278] border border-[#c2a278]/30 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-3">
-                        {m.name[0]}
+                {/* 2. Team Members */}
+                <section>
+                  <div className="text-center max-w-2xl mx-auto mb-12">
+                    <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] font-bold block mb-2">Key Personnel</span>
+                    <h2 className="text-2xl sm:text-4xl font-light text-white uppercase font-serif">OUR <span className="font-semibold">TEAM</span></h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {TEAM_MEMBERS.map((m, idx) => (
+                      <div key={idx} className="bg-zinc-900/40 border border-zinc-850 rounded-xl p-6 text-center">
+                        <div className="w-16 h-16 bg-[#c2a278]/10 text-[#c2a278] border border-[#c2a278]/30 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4 font-serif">
+                          {m.initials}
+                        </div>
+                        <h3 className="text-base font-bold text-white">{m.name}</h3>
+                        <span className="text-[10px] uppercase tracking-widest text-[#c2a278] font-bold block mb-3">{m.role}</span>
+                        <p className="text-zinc-400 text-xs font-light leading-relaxed">{m.desc}</p>
                       </div>
-                      <h3 className="text-base font-bold text-white">{m.name}</h3>
-                      <span className="text-[10px] uppercase tracking-widest text-[#c2a278] font-bold block mb-2">{m.role}</span>
-                      <p className="text-zinc-400 text-xs font-light leading-relaxed">{m.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
+                    ))}
+                  </div>
+                </section>
+
+                {/* 3. Offices */}
+                <section>
+                  <div className="text-center max-w-2xl mx-auto mb-12">
+                    <span className="text-xs uppercase tracking-[0.3em] text-[#c2a278] font-bold block mb-2">Global Presence</span>
+                    <h2 className="text-2xl sm:text-4xl font-light text-white uppercase font-serif">OUR <span className="font-semibold">OFFICES</span></h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {OFFICES.map((off, idx) => (
+                      <div key={idx} className="p-6 bg-zinc-900/50 border border-zinc-850 rounded-2xl relative overflow-hidden flex flex-col justify-between">
+                        <div>
+                          <span className="text-[10px] uppercase tracking-widest text-[#c2a278] font-bold block mb-1">{off.tag}</span>
+                          <h3 className="text-xl font-bold text-white mb-3">{off.title}</h3>
+                          <p className="text-zinc-400 text-xs leading-relaxed font-light mb-6">{off.address}</p>
+                        </div>
+                        <div className="pt-4 border-t border-zinc-800 text-xs text-[#c2a278] font-mono space-y-1">
+                          {off.phones && off.phones.map((p, i) => <div key={i}>📞 {p}</div>)}
+                          {off.status && <div className="inline-block bg-[#c2a278]/10 text-[#c2a278] border border-[#c2a278]/30 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-widest">{off.status}</div>}
+                          <div>✉ {off.email}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+              </div>
             )}
 
+            {/* CONTACT TAB */}
             {activeTab === 'contact' && (
               <section className="py-16 px-6 max-w-6xl mx-auto">
                 <div className="text-center max-w-3xl mx-auto mb-12">
@@ -567,7 +710,7 @@
                         <h3 className="font-bold text-white mb-1">{off.title}</h3>
                         <p className="text-zinc-400 mb-2 font-light">{off.address}</p>
                         <div className="text-[#c2a278] font-mono space-y-1">
-                          <div>📞 {off.phone}</div>
+                          {off.phones && off.phones.map((p, i) => <div key={i}>📞 {p}</div>)}
                           <div>✉ {off.email}</div>
                         </div>
                       </div>
@@ -603,6 +746,53 @@
               </section>
             )}
           </main>
+
+          {/* AI CHAT CONCIERGE WIDGET */}
+          <div className="fixed bottom-6 right-6 z-50">
+            {!chatOpen ? (
+              <button 
+                onClick={() => setChatOpen(true)}
+                className="bg-[#c2a278] text-zinc-950 p-4 rounded-full shadow-2xl hover:scale-105 transition-all flex items-center space-x-2 font-bold text-xs uppercase tracking-wider"
+              >
+                <span>💬 AFA AI Assistant</span>
+              </button>
+            ) : (
+              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-[320px] sm:w-[380px] h-[480px] shadow-2xl flex flex-col justify-between overflow-hidden">
+                <div className="bg-zinc-950 px-5 py-4 border-b border-zinc-800 flex justify-between items-center">
+                  <div>
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider">AFA AI Representative</h4>
+                    <span className="text-[9px] text-[#c2a278]">archi-athar.com</span>
+                  </div>
+                  <button onClick={() => setChatOpen(false)} className="text-zinc-400 hover:text-white">✕</button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {chatMessages.map((m, idx) => (
+                    <div key={idx} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`p-3 rounded-xl max-w-[85%] text-xs leading-relaxed ${m.role === 'user' ? 'bg-[#c2a278] text-zinc-950 font-semibold' : 'bg-zinc-950 text-zinc-300 border border-zinc-800'}`}>
+                        {m.text}
+                      </div>
+                    </div>
+                  ))}
+                  {chatLoading && (
+                    <div className="text-[10px] text-zinc-500 font-mono animate-pulse">AFA AI is typing...</div>
+                  )}
+                  <div ref={chatEndRef} />
+                </div>
+
+                <form onSubmit={handleSendMessage} className="p-3 bg-zinc-950 border-t border-zinc-800 flex items-center space-x-2">
+                  <input 
+                    type="text" 
+                    value={chatInput} 
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="Ask about our services or offices..."
+                    className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c2a278]"
+                  />
+                  <button type="submit" className="bg-[#c2a278] text-zinc-950 font-bold px-3 py-2 rounded-lg text-xs">Send</button>
+                </form>
+              </div>
+            )}
+          </div>
 
           {/* FOOTER */}
           <footer className="bg-zinc-900 border-t border-zinc-800 py-8 px-6 text-center text-xs text-zinc-500 font-mono">
