@@ -32,7 +32,6 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
-    // DATA FROM ARCHI-ATHAR.COM
     const HERO_SLIDES = [
       {
         id: 1,
@@ -369,11 +368,11 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
       return (
         <div className="min-h-screen flex flex-col justify-between">
           
-          <!-- NAVBAR -->
+          {/* NAVBAR */}
           <nav className="sticky top-0 bg-zinc-950/95 backdrop-blur-md border-b border-zinc-900 z-50">
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
               
-              <!-- Logo -->
+              {/* Logo */}
               <div className="flex items-center space-x-3 cursor-pointer" onClick={() => { setActiveTab('home'); setMobileMenuOpen(false); }}>
                 <div className="w-10 h-10 border-2 border-[#c2a278] flex items-center justify-center rounded-lg bg-zinc-900">
                   <span className="text-[#c2a278] font-bold text-xl tracking-tighter">AFA</span>
@@ -384,7 +383,7 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
                 </div>
               </div>
 
-              <!-- Desktop Nav Links -->
+              {/* Desktop Nav Links */}
               <div className="hidden md:flex items-center space-x-1 text-xs uppercase tracking-widest font-semibold">
                 {navTabs.map(tab => (
                   <button
@@ -401,7 +400,7 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
                 ))}
               </div>
 
-              <!-- Right Actions: Desktop CTA & Mobile Hamburger -->
+              {/* Right Actions: Desktop CTA & Mobile Hamburger */}
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => { setActiveTab('contact'); setMobileMenuOpen(false); }}
@@ -410,19 +409,17 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
                   Get Quote
                 </button>
 
-                <!-- Hamburger Button (Mobile Only) -->
+                {/* Hamburger Button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                   className="md:hidden text-zinc-200 hover:text-[#c2a278] p-2 focus:outline-none"
                   aria-label="Toggle Menu"
                 >
                   {mobileMenuOpen ? (
-                    <!-- Close Icon (✕) -->
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   ) : (
-                    <!-- Hamburger Icon (☰) -->
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
@@ -432,9 +429,9 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
 
             </div>
 
-            <!-- Mobile Menu Dropdown Drawer -->
+            {/* Mobile Menu Dropdown Drawer */}
             {mobileMenuOpen && (
-              <div className="md:hidden bg-zinc-900 border-b border-zinc-800 px-6 py-4 space-y-3 font-semibold text-xs uppercase tracking-widest animate-fadeIn">
+              <div className="md:hidden bg-zinc-900 border-b border-zinc-800 px-6 py-4 space-y-3 font-semibold text-xs uppercase tracking-widest">
                 {navTabs.map(tab => (
                   <button
                     key={tab.id}
