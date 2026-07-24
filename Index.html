@@ -219,7 +219,7 @@
     ];
 
     // ==========================================
-    // VIDEO LOADING SCREEN COMPONENT
+    // FULLSCREEN CROSS-PLATFORM VIDEO LOADER
     // ==========================================
     function VideoLoader({ onComplete }) {
       const videoRef = useRef(null);
@@ -232,6 +232,15 @@
         }, 500);
       };
 
+      // Ensure autoplay policy compliance for mobile browsers (iOS/Android)
+      useEffect(() => {
+        if (videoRef.current) {
+          videoRef.current.play().catch(error => {
+            console.log("Autoplay prevented by browser policy:", error);
+          });
+        }
+      }, []);
+
       return (
         <div className={`fixed inset-0 z-[100] bg-zinc-950 flex flex-col items-center justify-center transition-opacity duration-500 ${fading ? 'opacity-0' : 'opacity-100'}`}>
           <video 
@@ -240,12 +249,13 @@
             autoPlay 
             muted 
             playsInline
+            webkit-playsinline="true"
             onEnded={handleSkip}
-            className="w-full h-full object-contain max-w-4xl max-h-[85vh]"
+            className="absolute inset-0 w-full h-full object-cover"
           />
           <button 
             onClick={handleSkip}
-            className="absolute bottom-10 text-[10px] uppercase tracking-widest text-zinc-400 hover:text-white transition-colors underline font-mono bg-zinc-900/80 px-4 py-2 rounded-full border border-zinc-800"
+            className="absolute bottom-10 z-10 text-[10px] uppercase tracking-widest text-zinc-300 hover:text-white transition-colors underline font-mono bg-zinc-900/80 px-5 py-2.5 rounded-full border border-zinc-700 backdrop-blur-md shadow-2xl"
           >
             Skip Intro →
           </button>
@@ -404,7 +414,7 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
       return (
         <div className="min-h-screen flex flex-col justify-between">
           
-          {/* VIDEO LOADING SCREEN */}
+          {/* FULLSCREEN VIDEO LOADER */}
           {isLoading && (
             <VideoLoader onComplete={() => setIsLoading(false)} />
           )}
@@ -693,6 +703,7 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
               </section>
             )}
 
+            {/* ABOUT US & OFFICES TAB */}
             {activeTab === 'about' && (
               <div className="py-16 px-6 max-w-7xl mx-auto space-y-20">
                 <section className="text-center max-w-3xl mx-auto">
@@ -825,7 +836,7 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                  {chatMessages.map((m, idx) => (
+                  <chatMessages.map={(m, idx) => (
                     <div key={idx} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <div className={`p-3 rounded-xl max-w-[85%] text-xs leading-relaxed ${m.role === 'user' ? 'bg-[#c2a278] text-zinc-950 font-semibold' : 'bg-zinc-950 text-zinc-300 border border-zinc-800'}`}>
                         {m.text}
@@ -863,7 +874,7 @@ Respond in a sophisticated, polite, and professional tone suitable for a premium
       );
     }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
+    const root = ReactDOM.createRoot(rootEl = document.getElementById('root'));
     root.render(<App />);
   </script>
 </body>
